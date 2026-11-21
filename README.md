@@ -88,9 +88,10 @@ python -B replay/replay.py --verify
 python -B replay/replay.py --mutants
 ```
 
-The default mode prints six verified lines: the two cubic witnesses with their bond pins,
+The default mode prints seven lines: six verified results, namely the two cubic witnesses with their bond pins,
 the dimension-free general-`d` bound, the two dimension-one rows and the exact rational
-margins. `--verify` additionally runs two complete cubic enumerators at `N = 4,5,6,7`, an
+margins, followed by a one-line summary of the certificate. `--verify` additionally runs two
+complete cubic enumerators at `N = 4,5,6,7`, an
 `N = 7` against `N = 8` comparison, the two-dimensional count guards, independent
 recursive edge colourings, an independent Raney-coefficient derivation and a second,
 independently implemented interval certification of every bond pin. `--mutants` corrupts
