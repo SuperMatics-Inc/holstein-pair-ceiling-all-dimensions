@@ -1,0 +1,976 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{microtype,array,longtable}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\DOI}[1]{\mbox{\href{https://doi.org/#1}{\nolinkurl{#1}}}}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\dist}{dist}
+\newcommand{\Nodd}{N_{\mathrm{odd}}}
+\newcommand{\GC}{\mathrm{GC}}
+\newcommand{\src}{\mathrm{src}}
+\newcommand{\phys}{\mathrm{phys}}
+\setlength{\emergencystretch}{2em}
+\title{Certified cubic and general-dimensional strong-coupling ceilings\newline
+for electronic pair correlations in the Holstein model}
+\author{Davis Rens\\SuperMatics Inc.\\\href{https://orcid.org/0000-0001-5839-5197}{ORCID 0000-0001-5839-5197}}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove a uniform-frequency ceiling for equal-time on-site electronic pair
+correlations in the spinful nearest-neighbour Holstein model on
+$(\mathbb Z/N\mathbb Z)^3$. With $U=F^2/K>0$, hopping $t\ge0$, arbitrary real
+common chemical potential and every phonon frequency $\Omega>0$, the bound is
+$k_B T_{\mathrm{pair}}\le27900\,t^2/U$ for all $N\ge4$, improved to
+$22800\,t^2/U$ for even $N$. At the corresponding thresholds, distinct-site
+pair correlations are bounded by $(11/100)(99/100)^{\dist(x,y)}$.
+For every integer $d\ge1$ we also prove the ceilings
+$5750d^3t^2/U$ for all $N\ge4$ and $4600d^3t^2/U$ for even $N$.
+The bounds transfer to translation-invariant thermodynamic canonical limits at
+interior density, including balanced spin sectors. The cubic all-size constant
+is about $2283$ times smaller than the earlier released hypercubic constant.
+The proof combines an exact two-site trace, bridge multiplicities, proper
+edge-colour H\"older decoupling, rooted-support enumeration, a degree-$2d$
+Raney majorant, and a source-augmented polymer expansion. Every finite
+arithmetic witness is certified by exact rational or outward-interval
+arithmetic, with independently implemented checks. These are bounds on the
+pair-correlation ceiling $T_{\mathrm{pair}}$, not determinations of a
+superconducting transition temperature $T_c$.
+\end{abstract}
+
+\section{Model, statements and comparison}\label{sec:model}
+
+Let $\Lambda_N^{(d)}=(\mathbb Z/N\mathbb Z)^d$, $N\ge4$, with nearest-neighbour
+edges, graph distance $\dist$, and physical coordination $p=2d$.
+In units $\hbar=1$, the centred spinful Holstein Hamiltonian is
+\begin{equation}\label{eq:hamiltonian}
+\begin{split}
+H={}&-t\sum_{\langle xy\rangle,\sigma}
+(c_{x\sigma}^{\dagger}c_{y\sigma}+c_{y\sigma}^{\dagger}c_{x\sigma})\\
+&+\sum_x\left[\frac{P_x^2}{2M}+\frac{KQ_x^2}{2}
+-FQ_x(n_x-1)-\mu_c n_x\right],
+\end{split}
+\end{equation}
+where $n_x=n_{x\uparrow}+n_{x\downarrow}$, $K,M>0$,
+$\Omega=\sqrt{K/M}>0$, $U=F^2/K>0$, and $t\ge0$.
+There is no direct electron-electron interaction. The notation $\mu_c$
+allows the usual harmless chemical-potential shift when an uncentred
+coupling is used; throughout it is any real common chemical potential.
+Write $\tau=k_BT>0$, $\beta=1/\tau$, and
+$\Delta_x=c_{x\downarrow}c_{x\uparrow}$ for the physical electronic pair field.
+The grand-canonical expectation is denoted by $\langle\cdot\rangle_\GC$.
+The ratio $t^2/U$ has units of energy; every constant below is dimensionless.
+
+Here $T_{\mathrm{pair}}$ is a ceiling above which distinct-site equal-time
+on-site pair correlations decay exponentially and are uniformly summable.
+It is not a claimed value of $T_c$. The results exclude on-site pair
+ off-diagonal long-range order above their ceilings, but do not prove that
+order occurs below them and do not address unrestricted extended pair fields.
+
+\begin{theorem}[Cubic pair clustering]\label{thm:cubic}
+For $d=3$, every $\Omega>0$, every real $\mu_c$, and every $N\ge4$, if
+\[
+\beta t^2/U\le1/27900,
+\]
+then, for $x\ne y$,
+\begin{equation}\label{eq:cubicdecay}
+|\langle\Delta_x^\dagger\Delta_y\rangle_\GC|
+\le\frac{11}{100}\left(\frac{99}{100}\right)^{\dist(x,y)}.
+\end{equation}
+For even $N\ge4$, the same bound holds under
+$\beta t^2/U\le1/22800$.
+Consequently $k_BT_{\mathrm{pair}}\le27900t^2/U$ for all sizes and
+$k_BT_{\mathrm{pair}}\le22800t^2/U$ for even sizes.
+\end{theorem}
+
+\begin{theorem}[A cubic-growth dimensional ceiling]\label{thm:general}
+For every integer $d\ge1$ and $N\ge4$, put
+\[
+C_{\mathrm{all}}(d)=5750d^3,\qquad C_{\mathrm{even}}(d)=4600d^3.
+\]
+If $\beta t^2/U\le1/C_{\mathrm{all}}(d)$, then
+\begin{equation}\label{eq:generaldecay}
+|\langle\Delta_x^\dagger\Delta_y\rangle_\GC|
+\le\frac{9}{40}\left(\frac{99}{100}\right)^{\dist(x,y)},\qquad x\ne y.
+\end{equation}
+For even $N$, $C_{\mathrm{even}}(d)$ suffices. Both assertions are uniform in
+$\Omega>0$, volume and real common chemical potential, with no $t/U$ cutoff.
+\end{theorem}
+
+\begin{corollary}[Canonical thermodynamic limits]\label{cor:canonical}
+The conclusions of Theorems~\ref{thm:cubic} and~\ref{thm:general} hold for
+translation-invariant thermodynamic limits of total-number canonical states
+at every interior density $\rho\in(0,2)$, and for balanced separately fixed
+spin-number sectors at interior density. This is not a uniform finite-volume
+canonical estimate, nor a claim about imbalanced separately fixed spin sectors.
+\end{corollary}
+
+For $t=0$, distinct-site pair correlations vanish; assume $t>0$ in the
+estimates below. The analytical arguments are supplemented by finite
+exact-rational and outward-interval computer checks. Neither those checks nor
+independent scientific review amount to journal peer review or formal
+proof-assistant verification.
+
+The earlier released hypercubic bound~\cite{rensCubic},
+\DOI{10.5281/zenodo.24412193}, is
+\[
+C_{\mathrm{old}}(d)=442368d^2(d+1)^2,
+\qquad C_{\mathrm{old}}(3)=63700992.
+\]
+Its all-size cubic constant divided by $27900$ is exactly $1769472/775$,
+approximately $2283.19$. The corresponding even-size ratio is $1327104/475$,
+approximately $2793.90$. The previously released two-dimensional
+result~\cite{rensSharp}, \DOI{10.5281/zenodo.24414616}, has constants $6000$
+for all $N\ge4$ and $4500$ for even $N$. Those released theorems are unchanged.
+The present general-dimensional bound is not claimed to improve their
+specialized two-dimensional constants.
+
+The model originates with Holstein~\cite{holstein1959}; Lang--Firsov
+representations are discussed in~\cite{hohenadler2007}. Strong-coupling
+expansions for attractive Holstein and Hubbard models~\cite{freericks1993}
+provide qualitative context. Our argument is instead a nonperturbative
+clustering estimate for the physical pair field, using the abstract polymer
+criterion~\cite{kotecky1986} and correlation-expansion framework~\cite{uelschi2004}.
+No numerical estimate of $T_c$, finite-frequency pair-hopping formula, or
+new quantitative literature claim is used in the proof.
+
+\section{Chronological phonon contraction and physical supports}\label{sec:contours}
+
+The local Lang--Firsov transformation diagonalizes the atomic oscillator
+coupling. After subtracting a constant, its atomic electronic Hamiltonian is
+\begin{equation}\label{eq:atomic}
+D_0=\frac{U}{2}\Nodd-\mu_c N_e,
+\qquad \Nodd=\sum_x\boldsymbol{1}_{\{n_x=1\}}.
+\end{equation}
+The hopping is dressed by endpoint displacements, with displacement magnitude
+squared $U/(2\Omega)$. Physical pair insertions have the corresponding
+charge-two displacements. In a closed chronological Fock trajectory, the
+local occupation $n_x(u)$ is periodic and piecewise constant, including
+these pair jumps.
+
+\begin{lemma}[Oscillator contraction]\label{lem:phonon}
+For every such trajectory, the normalized oscillator factor is
+$\exp(-\sum_x\Phi_\beta[n_x])\in(0,1]$, where
+\begin{align}
+\Phi_\beta[n]&=\frac14\int_0^\beta\!du\int_0^\beta\!dv\,
+[n(u)-n(v)]^2K_\beta(u-v),\label{eq:phi}\\
+K_\beta(w)&=\frac{U\Omega}{2}
+\frac{e^{-\Omega w}+e^{-\Omega(\beta-w)}}{1-e^{-\beta\Omega}},
+\qquad 0\le w\le\beta.\label{eq:kernel}
+\end{align}
+The kernel is periodically extended and has integral $U$.
+\end{lemma}
+\begin{proof}
+The chronological displacement identity, including the ordering convention,
+is recorded in Appendix~\ref{app:oscillator}. Integrating the kernel twice by
+parts across the neutral occupation jumps gives~\eqref{eq:phi}.
+The kernel is positive for every $\Omega>0$, and integration of the two
+exponentials gives $\int_0^\beta K_\beta=U$. Thus $\Phi_\beta\ge0$.
+Neither the number of sites nor the dimension enters this calculation.
+\end{proof}
+
+Remove the CAR signs from each legal directed spin hop and denote the
+resulting symmetric, entrywise nonnegative bond matrix by $B_e$.
+The chronological expansion, bounded by Lemma~\ref{lem:phonon}, is a positive
+signless electronic trajectory majorant. It retains all spatial overlaps and
+all hopping orders; no factorization in time or restriction to initially
+even occupations is made.
+
+Group terms by their distinct used edge labels $E$. Components with disjoint
+vertex sets factor, since their atomic traces are independent and their
+fermion-even bond or pair-source operators commute on disjoint sets.
+Chronological shuffles then give a hard-core spatial polymer gas with
+connected, nonempty edge supports and incompatibility by vertex intersection.
+Write $w(E)$ for a physical activity and $w_{xy}(E)$ for a pair-marked activity.
+The usual connected-support identity is
+\begin{equation}\label{eq:pairpolymer}
+\langle\Delta_x^\dagger\Delta_y\rangle_\GC
+=\sum_{\substack{E\text{ connected}\\x,y\in V(E)}}
+w_{xy}(E)\frac{Z_{\Lambda\setminus V(E)}}{Z_\Lambda}.
+\end{equation}
+The dimension-independent support representation, bridge and trace lemmas
+are the same local lemmas used in the released two-dimensional
+proof~\cite{rensSharp}, Sections 3--6 and its oscillator appendix.
+We repeat their quantitative content and derive all geometric dependence below.
+
+\section{The exact bond and its fugacity supremum}\label{sec:bond}
+
+Put $b=\beta U$, $q_b=e^{-b/2}$, $z=e^{\beta\mu_c}$, and let $g\ge0$ be the
+dimensionless hopping argument. The one-site atomic partition polynomial is
+$z_a(z)=1+2q_bz+z^2$.
+
+\begin{lemma}[Two-site spectrum and uniform fugacity bound]\label{lem:bond}
+The normalized two-site trace ratio is
+\begin{equation}\label{eq:exactratio}
+R(b,g,z)=\frac{1+z^4+4q_b(z+z^3)\cosh g
++z^2(1+3q_b^2+2q_b\cosh r)}{z_a(z)^2},
+\quad r=\sqrt{b^2/4+4g^2}.
+\end{equation}
+It is maximized over $z>0$ at $z=1$, and
+\begin{equation}\label{eq:bondub}
+R(b,g,z)\le R_{\mathrm{ub}}(b,g):=
+\frac{3+4q_b^2+8q_b\cosh g+e^{r-b/2}}{4(1+q_b)^2}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+The two-site Fock space has dimension 16. In the zero- and four-electron
+sectors the electronic exponent is zero. Each of the one- and three-electron
+sectors has eigenvalues $-b/2\pm g$, each with multiplicity two.
+In the two-electron sector they are $-b$ with multiplicity three, $0$ with
+multiplicity one, and $-b/2\pm r$. Tracing these five sectors gives
+\eqref{eq:exactratio}. This is also a direct diagonalization of the
+signless single-bond matrix, which is gauge-equivalent to its two-site CAR matrix.
+
+Let $w=z+z^{-1}\ge2$. Subtraction of the atomic denominator gives
+\[
+R=1+\frac{Aw+B_0}{(w+2q_b)^2},\quad
+A=4q_b(\cosh g-1),\quad B_0=2q_b\cosh r-q_b^2-1.
+\]
+Here $A\ge0$ and $B_0\ge0$, because $r\ge b/2$.
+The derivative in $w$ has numerator $-Aw+2Aq_b-2B_0\le0$.
+Thus $w=2$, equivalently $z=1$, is worst, uniformly in $\mu_c$.
+Finally $e^{-r-b/2}\le e^{-b}=q_b^2$ gives~\eqref{eq:bondub}.
+The coefficient $3q_b^2$ belongs to the exact spectrum; $4q_b^2$ appears
+only after this upper bound. No atomic fugacity penalty is introduced.
+\end{proof}
+
+\section{Bridge multiplicities, colours and the free scale}\label{sec:weights}
+
+For connected $E$, write $k=|E|$, $v=|V(E)|$, $h(E)$ for its bridge count,
+and $m=k+h(E)$. A physical edge is active only if at least one hop uses it.
+
+\begin{lemma}[Multiplicity and coloured trace bound]\label{lem:weight}
+Every active physical bridge has at least two hops, both in a vacuum contour
+and in a pair-marked contour. Thus the total physical hopping multiplicity is
+at least $m$. The same assertion holds within each connected physical
+component of a source-augmented contour.
+If $E$ has a proper $c$-edge-colouring and $Cy\ge1$, define
+\[
+\ell=\sqrt{Cy},\qquad
+M(c,y)\ge\sup_{b\ge0}R_{\mathrm{ub}}(b,c\sqrt{yb}).
+\]
+Under $\beta t^2/U\le1/C$,
+\begin{equation}\label{eq:weight}
+|w(E)|,\ |w_{xy}(E)|\le
+R_E:=(Cy)^{-m/2}M(c,y)^{k/c}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Removing a bridge partitions the physical component into two sides.
+A hop through it changes the electron number on one side by one.
+Closed trajectories return that number modulo two; pair insertions and pair
+transfers change it by zero or two. The bridge hopping count is therefore
+even and, for an active edge, at least two. Nonbridges require at least one
+hop, proving the lower bound $m$.
+
+Scale all physical hopping labels by $\ell\ge1$. Each trajectory's scale
+penalty is at most $\ell^{-m}$. Apply Schatten H\"older, or log-trace
+convexity together with the product formula~\cite{trotter1959}, to the $c$
+matching colour classes. It multiplies the hopping argument on each matching
+by $c$. The matching trace factors into single-bond traces and untouched
+atomic sites. The pair insertion has operator norm at most one and its
+endpoint trace is bounded by the same positive contour argument.
+These dimension-independent trace statements are the coloured H\"older and
+pair norm lemmas of~\cite{rensSharp}, Section 6. The product of the single-bond
+ratios, to the power $1/c$, gives $M^{k/c}$.
+
+Indeed, with $b=\beta U$ and $g=c\ell\beta t$,
+\[
+g^2=c^2Cy\,\beta U\,(\beta t^2/U)\le c^2yb.
+\]
+The bond ratio increases with $g\ge0$, so the stated supremum suffices.
+This proves~\eqref{eq:weight} without a restriction on $\Omega$ or $\mu_c$.
+\end{proof}
+
+The scale is $y=\ell^2/C$, not $\ell^2$. Its admissibility is the lower
+constraint $Cy\ge1$. At fixed $y>0$ the finite bond constant is independent
+of $C$, and the tail edge weight
+\begin{equation}\label{eq:tailweight}
+w=\frac{B M(c,y)^{1/c}}{q\sqrt{Cy}}
+\end{equation}
+tends to zero as $C$ increases. The factors $B>1$ and $q\in(0,1)$ will be
+the vertex budget and decay penalty. A class-specific choice of $y$ is
+allowed: it bounds each support class separately and does not alter the
+Hamiltonian. Choosing an unproved smaller colour count is not allowed.
+
+\begin{lemma}[Proper colour counts]\label{lem:colours}
+The torus has edge chromatic number $2d$ for even $N$ and $2d+1$ for odd $N$.
+For a small simple support $E$, a valid cap is its maximum degree $\delta(E)$
+if it is bipartite, and $\delta(E)+1$ otherwise.
+\end{lemma}
+\begin{proof}
+For even $N$, direction $j$ uses two colours distinguished by the parity
+of the starting coordinate $x_j$. They form $2d$ matchings; degree gives
+the lower bound.
+For an odd cycle alternate two colours on its non-wrap edges and put a
+third colour on its wrap edge. Every vertex has exactly one missing colour.
+Inductively copy a $(2d-1)$-colouring of the $(d-1)$-torus into each layer,
+use two new colours alternately on the new non-wrap edges, and colour the
+new wrap edge through old vertex $a$ by the unique old colour missing at $a$.
+That colour is missing at both endpoints, and the wrap edges form a matching.
+This gives $2d+1$ colours. For odd $N$, a matching has at most
+$(N^d-1)/2$ edges; $2d$ such matchings cannot cover the $dN^d$ physical edges.
+The class caps are the bipartite edge-colouring theorem and the simple-graph
+maximum-degree-plus-one theorem. A three-edge claw in particular needs three
+colours. The physical degree remains $p=2d$ even on an odd torus.
+\end{proof}
+
+\section{Rooted support counts and the cubic class table}\label{sec:counting}
+
+Fix an ordering of incident physical edges at each vertex. Deterministic
+labelled depth-first exploration encodes a connected edge set in $p$ root
+slots and $p-1$ forward slots per physical edge token. An edge to an already
+visited vertex is a terminal token; its ambient slot identifies its endpoint.
+The code reconstructs the support, including cycles, so the exploration is
+injective into the ordered-tree majorant.
+
+\begin{lemma}[Degree-$p$ Raney majorant]\label{lem:raney}
+Let the least nonnegative solution satisfy
+\begin{equation}\label{eq:raney}
+T=1+wT^{p-1},\qquad G_{\phys}=T^p.
+\end{equation}
+The number of connected rooted $k$-edge supports is at most
+\begin{equation}\label{eq:raneycoeff}
+R_p(k)=[w^k]T^p=
+\frac{p}{(p-1)k+p}\binom{(p-1)k+p}{k}.
+\end{equation}
+For rational $T_0>1$ with $(p-1)(T_0-1)/T_0<1$, put
+$w_{\mathrm{eff}}=(T_0-1)/T_0^{p-1}$.
+For $0\le w\le w_{\mathrm{eff}}$, the $k\ge7$ tail is bounded by
+\begin{equation}\label{eq:raneytail}
+T_0^p-\sum_{k=0}^6 R_p(k)w_{\mathrm{eff}}^k.
+\end{equation}
+\end{lemma}
+\begin{proof}
+The preceding slot encoding gives~\eqref{eq:raney}; Lagrange inversion gives
+\eqref{eq:raneycoeff}. For $p>2$ the branch condition selects the small root
+before its critical point $(p-1)/(p-2)$. For $p=2$, $T=(1-w)^{-1}$ and
+$w_{\mathrm{eff}}<1$. The tail series has nonnegative coefficients and is
+increasing in $w$, so its complete value at $w_{\mathrm{eff}}$ is an upper
+bound. The root and the subtracted polynomial are evaluated at the same
+weight; no mixed-weight tail subtraction is used.
+\end{proof}
+
+For $p=6$, the coefficients through $k=6$ are
+\[
+1,\ 6,\ 45,\ 380,\ 3450,\ 32886,\ 324632.
+\]
+They are independently re-derived by formal polynomial fixed-point iteration
+in the certificate, without using the binomial formula.
+
+\begin{proposition}[Cubic small-support domination]\label{prop:classes}
+Table~\ref{tab:classes} dominates rooted connected supports with $k\le6$ on
+all even cubic tori $N\ge4$. To dominate every $N\ge4$, add the two starred
+rows. The row fields are $(v,k,c,m,n)$, where $n$ is the rooted count and $c$
+is the valid cap of Lemma~\ref{lem:colours}. The even table has 21 rows and
+count sum $337498$; the all-size table has 23 rows and sum $337573$.
+\end{proposition}
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{rrrrr@{\qquad}l}
+$v$&$k$&$c$&$m$&$n$&\text{scope}\\\hline
+2&1&1&2&6&both\\
+3&2&2&4&45&both\\
+4&3&2&6&300&both\\
+4&3&3&6&80&both\\
+4&4&2&4&15&both\\
+5&4&2&8&1815&both\\
+5&4&3&8&1500&both\\
+5&4&4&8&75&both\\
+5&5&3&5&3&all sizes only ($*$)\\
+5&5&3&6&300&both\\
+6&5&2&10&10602&both\\
+6&5&3&10&18936&both\\
+6&5&4&10&1800&both\\
+6&5&5&10&36&both\\
+6&6&2&6&240&both\\
+6&6&3&8&3960&both\\
+6&6&4&7&72&all sizes only ($*$)\\
+6&6&4&8&540&both\\
+7&6&2&12&59241&both\\
+7&6&3&12&208012&both\\
+7&6&4&12&28938&both\\
+7&6&5&12&1050&both\\
+7&6&6&12&7&both\\\hline
+\end{tabular}
+\caption{Classwise-max cubic support counts.}\label{tab:classes}
+\end{table}
+
+\begin{proof}[Proof of Proposition~\ref{prop:classes}]
+Two complete enumerators agree class-by-class at $N=4,5,6,7$, with respective
+totals $329734$, $335959$, $336409$, $336427$ and class counts $21$, $23$, $21$,
+$21$. The primary uses levelwise integer edge masks, Tarjan low-link bridges
+and breadth-first bipartiteness. The secondary uses reversed edge ordering,
+frozenset supports, edge-deletion reachability for bridges and vertex-incidence
+row reduction over $\mathbb F_2$ for bipartiteness. Each retains each support
+once. Taking rowwise maxima over $N=4,6,7$ gives the even table; adding $N=5$
+gives the all-size table. The count sum of a rowwise maximum is not claimed
+to be the count on a single torus.
+
+For $N\ge7$, every cycle in a $k\le6$ support has length below $N$, so cannot
+wind around any coordinate. Lifting along a spanning tree gives signed unit
+coordinate displacements with zero displacement around all cycles. Distinct
+vertices cannot collide because their connecting tree path has at most six
+edges, too few for a nonzero displacement multiple of $N$. Conversely,
+reduction modulo $N$ embeds each such rooted lattice support. Thus the table
+stabilizes for all $N\ge7$. The certificate additionally checks $T_7=T_8$.
+It also reproduces the independent two-dimensional 18/20 class guards from
+the released proof~\cite{rensSharp}, Section 7.
+\end{proof}
+
+\section{Certified bond pins and the cubic vertex sum}\label{sec:cubicbudget}
+
+Put $a=c^2y$ and
+\[
+h(b)=\sqrt{b^2/4+4ab}-b/2
+=\frac{4ab}{\sqrt{b^2/4+4ab}+b/2},\qquad h(0)=0.
+\]
+This function increases from zero to $4a$. On a closed interval
+$[b_0,b_1]$, bound $q_b$ between its endpoint values, $g$ above by
+$\sqrt{ab_1}$, and $h$ above by its value at $b_1$, using a lower square-root
+enclosure in the rationalized expression. Bounding the numerator of
+\eqref{eq:bondub} upwards and its denominator downwards gives a valid
+interval bound, not a presumption that a grid locates the supremum.
+
+For $b\ge40$ all the chosen pins have $40\ge4a$. Hence
+$-b/2+\sqrt{ab}$ is decreasing, $h\le4a$, and
+\begin{equation}\label{eq:inftail}
+R_{\mathrm{ub}}\le
+\frac{3+4e^{-40}+4e^{-20+\sqrt{40a}}+4e^{-20}+e^{4a}}4.
+\end{equation}
+Adaptive closed-interval bisection covers $[0,40]$ and this formula covers
+$[40,\infty)$. Both the $b=0$ endpoint and the infinite tail are included.
+
+\begin{proposition}[Uniform bond pins]\label{prop:pins}
+For every row of Table~\ref{tab:pins}, its rational $M$ bounds
+$\sup_{b\ge0}R_{\mathrm{ub}}(b,c\sqrt{yb})$.
+\end{proposition}
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{rrrr}
+$c$&$m/k$&$y$&$M$\\\hline
+1&2&$299/1000$&$79/50$\\
+2&2&$39/250$&$1893/500$\\
+2&1&$1/10$&$249/125$\\
+3&2&$23/250$&$1903/250$\\
+3&1&$57/1000$&$1349/500$\\
+3&$6/5$&$13/200$&$837/250$\\
+3&$4/3$&$69/1000$&$15/4$\\
+4&2&$13/200$&$1677/100$\\
+4&$7/6$&$43/1000$&$584/125$\\
+4&$4/3$&$6/125$&$123/20$\\
+5&2&$51/1000$&$20879/500$\\
+6&2&$21/500$&$10657/100$\\
+6&1 (tail)&$23/1000$&$1903/250$\\
+7&1 (tail)&$19/1000$&$1111/100$\\\hline
+\end{tabular}
+\caption{Bond bounds; $m/k$ selects the shared class pin.}\label{tab:pins}
+\end{table}
+\begin{proof}
+The first implementation uses outward 48-bit dyadic rational rounding,
+Taylor/range-reduced exponentials, rounded Newton upper square roots and
+reciprocal lower square-root bounds. The independent implementation uses an
+unrounded 24-term rational Taylor sum with a positive geometric remainder,
+rational powers, and integer-square-root enclosures. They each cover the
+14 distinct pins on 101 accepted cells, plus~\eqref{eq:inftail}.
+All branch and enclosure decisions are exact integer or rational comparisons.
+Section~\ref{sec:certificate} describes the arithmetic independently of its
+floating-point display output.
+\end{proof}
+
+For $q=99/100$, define a rooted physical vertex upper bound
+\begin{equation}\label{eq:physicalbudget}
+\begin{split}
+S_{\phys}={}&\sum_{k\le6\text{ classes}}
+ n B^v (Cy)^{-m/2}M^{k/c}q^{-k}\\
+&+B\left[T_0^6-\sum_{k=0}^6R_6(k)w_{\mathrm{eff}}^k\right].
+\end{split}
+\end{equation}
+For the tail, $v\le k+1$ and $m\ge k$ give the outside factor $B$ and the
+per-edge factor~\eqref{eq:tailweight}. In particular, $B$ is not omitted
+from that edge factor. We impose the stronger source-compatible domination
+in the next section, which implies $w\le w_{\mathrm{eff}}$.
+
+Fractional powers in the finite sum are bounded by rational upper values
+$R=j/10^{10}$ satisfying
+\begin{equation}\label{eq:rootcomparison}
+R^{2c}(Cy)^{mc}\ge M^{2k}.
+\end{equation}
+This is an integer-power comparison, not numerical root extraction.
+The rowwise scales all satisfy $Cy\ge1$.
+
+\section{Source multigraph and the polymer criterion}\label{sec:source}
+
+Fix a nonzero displacement $r$ and phase $\theta$, and add the Hermitian,
+number-conserving source
+\[
+X_r=\sum_x[e^{i\theta}\Delta_x^\dagger\Delta_{x+r}+\mathrm{h.c.}],
+\qquad H(\xi)=H-\xi X_r.
+\]
+It has at most two labelled source incidences per vertex, even when
+$r=-r$ modulo $N$, in which case parallel labels form a multigraph.
+There is no dependence of this source degree on $d$ or $|r|$.
+Set
+\begin{equation}\label{eq:sourcedisk}
+L=100000,\qquad \xi_0=\frac{\tau}{2L}=\frac{\tau}{200000},
+\qquad |\xi|\le\xi_0.
+\end{equation}
+The chronological norm estimate for $k_s$ source labels and connected
+physical components $E_i$ is
+\begin{equation}\label{eq:sourceactivity}
+|w(E_\phys\sqcup E_\src)|
+\le L^{-k_s}(e^{2\beta L|\xi|}-1)^{k_s}\prod_i R_{E_i}.
+\end{equation}
+To obtain it, separate source insertion times, bound the normalized phonon
+factor by one, and use Schatten H\"older on the intervening positive
+propagators $e^{\Delta s H_\phys}$, whose times sum to $\beta$, with the
+source operator norm at most one. This is the dimension-independent
+source estimate of the released two-dimensional proof~\cite{rensSharp},
+Section 10. On~\eqref{eq:sourcedisk}, $e^{2\beta L|\xi|}-1\le e-1<2<3$;
+therefore $w_s=3B/L$ bounds a source edge after the vertex factor is absorbed.
+Contracting physical components gives $v\le k_p+k_s+1$.
+
+\begin{lemma}[Source-compatible exploration]\label{lem:source}
+The labelled physical/source exploration has generating functions
+\begin{equation}\label{eq:twovar}
+P=1+w_pP^{p-1}S^2,\qquad S=(1-w_sP^p)^{-1},\qquad G=P^pS^2.
+\end{equation}
+For $T=T_0$, define
+\begin{equation}\label{eq:sourceparams}
+S_\mathrm{hi}=(1-w_sT^p)^{-1},\qquad
+w_p=\frac{T-1}{T^{p-1}S_\mathrm{hi}^2}.
+\end{equation}
+If $w_sT^p<1$ and
+\begin{equation}\label{eq:den}
+\mathrm{den}=1-(p-1)w_pT^{p-2}S_\mathrm{hi}^2
+-2p w_pw_sT^{2p-2}S_\mathrm{hi}^3>0,
+\end{equation}
+then a rooted source-containing vertex upper bound is
+\begin{align}
+D_P&=\frac{2w_pT^{2p-1}S_\mathrm{hi}^3}{\mathrm{den}},\label{eq:Dp}\\
+D_S&=T^pS_\mathrm{hi}^2+pw_sT^{p-1}S_\mathrm{hi}^2D_P,\label{eq:Ds}\\
+S_\src&=Bw_s[pT^{p-1}S_\mathrm{hi}^2D_P+2T^pS_\mathrm{hi}D_S].\label{eq:srcbudget}
+\end{align}
+It applies whenever, for every physical component,
+\begin{equation}\label{eq:component}
+B^kR_Eq^{-k}\le w_p^k.
+\end{equation}
+\end{lemma}
+\begin{proof}
+A physical arrival leaves $p-1$ physical slots and two source slots; a source
+arrival leaves $p$ physical slots and one forward source slot.
+This gives~\eqref{eq:twovar}, also when labels are parallel. The rectangle
+$1\le P\le T$, $1\le S\le S_\mathrm{hi}$ is invariant under monotone iteration
+from $(1,1)$. Differentiating both implicit equations, including the dependence
+of $S$ on $P$, gives~\eqref{eq:den}--\eqref{eq:Ds}.
+The term $2p=4d$, equal to 12 at $d=3$, must be retained.
+All series coefficients are nonnegative, so evaluation at the rectangle
+boundary bounds their derivatives. The sum over at least one source label is
+at most $w_s\partial_{w_s}G$, yielding~\eqref{eq:srcbudget}.
+Equation~\eqref{eq:component} and~\eqref{eq:sourceactivity} then justify
+assigning each physical token weight $w_p$.
+\end{proof}
+
+For the $k\ge7$ components, a sufficient exact rational form of
+\eqref{eq:component} is
+\begin{equation}\label{eq:tailsource}
+(B^cM_{\mathrm{tail}})^2
+\le(w_pq)^{2c}(Cy_{\mathrm{tail}})^c.
+\end{equation}
+For every small row it is checked with~\eqref{eq:rootcomparison}.
+The independent eliminated Jacobian identity is
+\[
+\mathrm{den}=1-(p-1)(T-1)/T
+-2p(T-1)w_sT^{p-1}S_\mathrm{hi}.
+\]
+
+\begin{lemma}[KP deletion and pair bound]\label{lem:kp}
+If $S_\phys+S_\src\le\ln B$, then the source expansion is analytic on
+\eqref{eq:sourcedisk}, the deletion ratio satisfies
+$|Z_{\Lambda\setminus S}/Z_\Lambda|\le B^{|S|}$, and at zero source
+\[
+|\langle\Delta_x^\dagger\Delta_y\rangle_\GC|
+\le(\ln B)q^{\dist(x,y)}.
+\]
+\end{lemma}
+\begin{proof}
+Use the Koteck\'y--Preiss criterion~\cite{kotecky1986} with
+$a(E)=|V(E)|\ln B$ and the additional physical-edge decay penalty
+$b(E)=|E_\phys|\ln(1/q)$. A vertex sum bounded by $\ln B$ implies the
+incompatibility sum by a union bound over the vertices of the test polymer.
+Pinning each vertex to be deleted gives the stated deletion bound.
+In~\eqref{eq:pairpolymer}, each support connecting $x,y$ has at least
+$\dist(x,y)$ physical edges. Extracting its decay factor gives the result.
+The source estimate is used for analyticity, not for a claimed nonzero-source
+pair decay inequality.
+\end{proof}
+
+\begin{proposition}[Cubic joint KP witnesses]\label{prop:cubicbudget}
+For $q=99/100$ and $L=100000$, the following rational choices satisfy all
+small-row and tail scale, source-component, small-branch, pole, Jacobian,
+vertex-budget and prefactor inequalities:
+\[
+\begin{array}{c|ccc}
+\text{scope}&C&B&T_0\\\hline
+\text{even }N&22800&277/250&449/400\\
+\text{all }N&27900&111/100&1123/1000
+\end{array}
+\]
+The conservative decimal summaries are
+\[
+\begin{array}{c|ccc}
+& S_\phys\text{ upper}&S_\src\text{ upper}&\ln B\text{ lower}\\\hline
+\text{even}&0.101751108&0.000719841&0.102556588\\
+\text{all}&0.103493088&0.000729760&0.104360015
+\end{array}
+\]
+with positive margins exceeding $0.000085641$ and $0.000137168$,
+respectively. Both upper bounds on $\ln B$ are below $11/100$.
+\end{proposition}
+\begin{proof}
+The certificate computes the finite sums, tails and source bounds using
+exact rational comparisons and the enclosures in Proposition~\ref{prop:pins}.
+The displayed decimals are conservatively rounded summaries, not proof inputs.
+Its independent verification re-certifies all bond pins and all small-support
+counts. Applying Lemma~\ref{lem:kp} proves Theorem~\ref{thm:cubic}.
+\end{proof}
+
+\section{A uniform cubic-growth bound in every dimension}\label{sec:general}
+
+The general-dimensional argument separates the single-edge support and uses
+all other supports through the $k\ge2$ Raney tail, so no small-support table
+is needed.
+
+\begin{lemma}[A simple uniform bond estimate]\label{lem:simplebond}
+For $a=c^2y$ and all $b\ge0$,
+\begin{equation}\label{eq:simplebond}
+R_{\mathrm{ub}}(b,c\sqrt{yb})\le\frac34+e^{a/2}+\frac14e^{4a}.
+\end{equation}
+For $c\ge4$ and $y=1/(8c)$, the right side is at most $e^{c/2}$.
+Thus, whenever $Cy\ge1$ and $m\ge k$,
+\begin{equation}\label{eq:generalweight}
+R_E\le\left(\sqrt{8ec/C}\right)^k.
+\end{equation}
+For the one-edge support, use $c=1$, $m=2$, $y=1/8$ and
+\begin{equation}\label{eq:onebond}
+M_1=\frac34+e^{1/16}+\frac14e^{1/2}<\frac{23}{10},
+\qquad R_1\le8M_1/C.
+\end{equation}
+\end{lemma}
+\begin{proof}
+In~\eqref{eq:bondub}, $(3+4q_b^2)/(4(1+q_b)^2)\le3/4$ and $h\le4a$.
+Young's inequality gives $\sqrt{ab}\le(a+b)/2$, hence
+$\cosh\sqrt{ab}\le e^{a/2}\cosh(b/2)$.
+Also $2q_b\cosh(b/2)/(1+q_b)^2=(1+q_b^2)/(1+q_b)^2\le1$.
+This proves~\eqref{eq:simplebond}.
+For $a=c/8\ge1/2$, put $u=e^{a/2}>5/4$.
+The polynomial $u^8-(4/3)u-1$ is positive at $5/4$ and increasing thereafter,
+so $3/4+e^{a/2}+e^{4a}/4\le e^{4a}=e^{c/2}$.
+The two rational polynomial checks and the Taylor lower bound
+$e^{1/4}>5/4$ are explicit certificate checks.
+Lemma~\ref{lem:weight} now gives~\eqref{eq:generalweight}.
+Applying~\eqref{eq:simplebond} to the one-edge parameters gives
+\eqref{eq:onebond}; its rational Taylor upper bound is also certified.
+The special $c\ge4$ estimate is not claimed for smaller $c$.
+\end{proof}
+
+\subsection{Dimension-free rational reduction for \texorpdfstring{$d\ge2$}{d >= 2}}\label{sec:generalhigh}
+
+Choose
+\begin{equation}\label{eq:generalparams}
+B=5/4,\quad \alpha=7/20,\quad q=99/100,\quad L=100000,
+\quad p=2d,\quad T=1+\alpha/p.
+\end{equation}
+Let rational Taylor upper bounds satisfy $E_\alpha\ge e^\alpha$ and $E_1\ge e$,
+and put
+\[
+w_s=3B/L,\quad \overline S=(1-w_sE_\alpha)^{-1},\quad
+\overline D=1-\alpha-2\alpha w_sE_\alpha\overline S.
+\]
+The certificate verifies $w_sE_\alpha<1$ and $\overline D>0$.
+Since $T^p\le e^\alpha\le E_\alpha$ and
+$(p-1)(T-1)/T<\alpha<1$, this is on the small physical branch,
+$S_\mathrm{hi}\le\overline S$, $\mathrm{den}\ge\overline D$, and
+\begin{equation}\label{eq:wpbound}
+w_p\ge\frac{\alpha}{pE_\alpha\overline S^2}.
+\end{equation}
+
+Put
+\begin{equation}\label{eq:base}
+\mathcal B=E_1\left(\frac{B\overline S^2E_\alpha}{q\alpha}\right)^2.
+\end{equation}
+The source-compatible tail condition follows from~\eqref{eq:generalweight}
+and~\eqref{eq:wpbound} if $C\ge32cd^2\mathcal B$.
+For even sizes $c=2d$, this is $C\ge64d^3\mathcal B$.
+For all sizes, $c\le2d+1$ and $(2d+1)/d\le5/2$ when $d\ge2$, so
+$C\ge80d^3\mathcal B$ suffices.
+The exact rational upper evaluations satisfy
+\begin{equation}\label{eq:Kvalues}
+64\mathcal B<4560.229<4600,\qquad
+80\mathcal B<5700.286<5750.
+\end{equation}
+
+Scale admissibility is explicit: for $d\ge2$ the even tail has
+$Cy=4600d^2/16\ge1150$, and the all-size tail has
+$Cy=5750d^3/[8(2d+1)]\ge1150$, because this ratio increases with $d$.
+The one-edge scale has $Cy=C/8\ge4600/8=575$ for every $d\ge1$.
+The certificate checks the two $d=2$ tail minima and this global one-edge
+minimum. Thus the use of $m\ge k$ in~\eqref{eq:generalweight} is admissible.
+
+The $k\ge2$ rooted physical sum is bounded by
+\begin{equation}\label{eq:generaltail}
+S_{\mathrm{tail}}\le B[E_\alpha-1-\alpha/E_\alpha],
+\end{equation}
+because $pw_{\mathrm{eff}}=\alpha/T^{p-1}\ge\alpha/E_\alpha$.
+The number of one-edge rooted supports is $p=2d$, not $d$, giving
+\begin{equation}\label{eq:generalone}
+S_{\mathrm{one}}\le\frac{16B^2M_1}{4600d^2q}
+\le\frac{4B^2M_1}{4600q},\qquad d\ge2.
+\end{equation}
+For its source-component domination, a sufficient worst-case $d=2$ condition is
+\begin{equation}\label{eq:onesource}
+\frac{4BM_1}{4600q}\le\frac{\alpha}{E_\alpha\overline S^2}.
+\end{equation}
+
+Define
+\begin{align}
+J&=2\alpha E_\alpha^2\overline S^3/\overline D,\label{eq:J}\\
+\overline D_S&=E_\alpha\overline S^2+w_sJ,\label{eq:DbarS}\\
+S_{\src}&\le Bw_s[J+2E_\alpha\overline S\,\overline D_S].\label{eq:generalsource}
+\end{align}
+These follow directly from~\eqref{eq:Dp}--\eqref{eq:srcbudget}: substitute
+$w_p=(T-1)/(T^{p-1}S_\mathrm{hi}^2)$, use $p(T-1)=\alpha$,
+$T^{2p-1}\le E_\alpha^2$, and $\mathrm{den}\ge\overline D$.
+In particular $pT^{p-1}S_\mathrm{hi}^2D_P\le J$, which also bounds the
+implicit contribution in $D_S$. The source Jacobian factor $2p$ is retained.
+
+\begin{proposition}[Dimension-free joint budget]\label{prop:generalbudget}
+The rational upper bounds in~\eqref{eq:generalparams}--\eqref{eq:generalsource}
+satisfy~\eqref{eq:Kvalues},~\eqref{eq:onesource}, all scale constraints, and
+\[
+\begin{aligned}
+S_{\mathrm{tail}}&<0.215533397,&
+S_{\mathrm{one}}&<0.003055933,\\
+S_{\src}&<0.000290509,&
+\ln(5/4)&>0.223143551.
+\end{aligned}
+\]
+The joint KP margin exceeds $0.004263714$ and $\ln(5/4)<9/40$.
+\end{proposition}
+\begin{proof}
+Unrounded rational Taylor/geometric upper bounds on the exponentials and
+rational lower/upper logarithm bounds certify these inequalities.
+Independent finite-$d$ evaluations of the exact source equations at
+$d=2,3,4,7,100$ additionally check the directions of the eliminated source
+and tail bounds. The all-$d$ proof is the displayed majorant, not extrapolation
+from those sample dimensions. Lemma~\ref{lem:kp} proves
+Theorem~\ref{thm:general} for $d\ge2$.
+\end{proof}
+
+\subsection{Dimension one, without the \texorpdfstring{$c\ge4$}{c >= 4} shortcut}\label{sec:d1}
+
+For $d=1$, use $p=2$, $T=1+\alpha/2=47/40$ and the exact source equations
+\eqref{eq:sourceparams}--\eqref{eq:srcbudget}. Let $(c,K)$ be $(2,4600)$ for
+even sizes and $(3,5750)$ for all sizes. Set
+\[
+y=1/(8c),\qquad M_c=3/4+e^{c/16}+e^{c/2}/4.
+\]
+Use~\eqref{eq:simplebond}, not the $c\ge4$ shortcut. The exact required
+inequalities are
+\begin{align}
+(B^cM_c)^2&\le(w_pq)^{2c}(Ky)^c,\label{eq:d1tail}\\
+8BM_1/(Kq)&\le w_p,\label{eq:d1one}\\
+B[T^2-1-2(T-1)/T]+16B^2M_1/(Kq)+S_{\src}&\le\ln B.\label{eq:d1kp}
+\end{align}
+Scale admissibility is $Ky=575/2$ in the even case and $2875/12$ in the
+all-size case, both above one; $K/8\ge575$ for the one-edge scale.
+All inequalities, including $Ky\ge1$, are exact certificate guards.
+The joint sums are below $0.115906$ and $0.113462$, respectively, while
+$\ln B>0.223143551$.
+This completes Theorem~\ref{thm:general} for every $d\ge1$.
+
+\section{Canonical transfer and uniform summability}\label{sec:canonical}
+
+We give the pressure argument to specify the ensemble scope and the exact
+Cauchy radius. It is the canonical route used in the released
+proof~\cite{rensSharp}, Section 10, with its dimension dependence made explicit.
+For each fixed displacement $r$, the source expansion is analytic on
+$|\xi|\le\xi_0=\tau/200000$. The absolute cluster budget per site is below
+one, so its normalized log partition difference from zero source is bounded
+by two. Cauchy's estimate on the exact half-radius disk
+\begin{equation}\label{eq:cauchydisk}
+|\xi|\le\xi_0/2=\tau/400000
+\end{equation}
+bounds the quadratic remainder by $4\xi^2/\xi_0^2$ for real $\xi$.
+The derivative at zero source is
+$2\beta\operatorname{Re}(e^{i\theta}\langle\Delta_0^\dagger\Delta_r\rangle_\GC)$.
+Thus, with the appropriate $A$ and $q$ from the main theorem,
+\begin{equation}\label{eq:pressure}
+\frac1V\log\frac{Z_\GC(\xi;\mu_c)}{Z_\GC(0;\mu_c)}
+\le2\beta A q^{\dist(0,r)}|\xi|+4\xi^2/\xi_0^2.
+\end{equation}
+This uses zero-source pair decay only. Analyticity at nonzero source is not
+mistaken for a source-augmented pair decay theorem.
+
+Divide a large $d$-torus into fixed open blocks of side $L_b$. For each fixed
+$d$ and $r$, the dropped hopping and source boundary terms are bounded and
+have boundary-to-volume cost $O(1/L_b)$. The disconnected canonical partition
+is a sum over block number allocations; its log differs from the largest
+allocation log by at most the number of blocks times $\ln(2L_b^d+1)$.
+The per-site allocation entropy is therefore at most
+\[
+L_b^{-d}\ln(2L_b^d+1)\longrightarrow0.
+\]
+Atomic oscillator sector traces are finite, and electron occupations per site
+are finite. The block-subdivision equivalence-of-ensembles argument extends
+verbatim to $(\mathbb Z/N\mathbb Z)^d$ for each fixed $d$: the boundary and
+allocation terms vanish, and spin exchange is dimension-independent.
+It gives a finite concave canonical density function and its grand-canonical
+pressure dual. At an interior total density choose a finite supporting common
+chemical potential. Along the canonical thermodynamic sequence,
+\[
+\delta_V=V^{-1}[\log Z_\GC(0;\mu_c)-\log Z_{N_e}(0)-\beta\mu_cN_e]
+\ge0,\qquad \delta_V\longrightarrow0.
+\]
+Since $e^{\beta\mu_cN_e}Z_{N_e}(\xi)\le Z_\GC(\xi;\mu_c)$ for real $\xi$,
+combine this fact with~\eqref{eq:pressure}. Convexity of the canonical
+real-source log partition bounds its derivative by secants, giving
+\begin{equation}\label{eq:canonicalsecant}
+\begin{split}
+|2\beta\operatorname{Re}(e^{i\theta}
+\langle\Delta_0^\dagger\Delta_r\rangle_{N_e})|
+\le{}&2\beta A q^{\dist(0,r)}\\
+&+4\xi/\xi_0^2+\delta_V/\xi,
+\quad 0<\xi\le\xi_0/2.
+\end{split}
+\end{equation}
+Take the thermodynamic limit first at fixed $\xi$, then $\xi\to0$, and vary
+$\theta$. This proves the stated canonical bound for each fixed displacement.
+It does not provide a uniform finite-volume canonical deletion ratio.
+
+For separately fixed spin sectors, use allocations of $(N_\uparrow,N_\downarrow)$.
+Their entropy per block is at most $2\ln(L_b^d+1)$, still vanishing per site.
+At a balanced interior density, a finite supporting chemical-potential vector
+and its spin-swapped vector are both supporting, so their average has equal
+components. A real common chemical potential thus supports the balanced
+point. The source preserves both spin numbers, and the same secant proof
+applies. No common-potential support is asserted at imbalanced densities.
+This proves Corollary~\ref{cor:canonical}.
+
+For fixed $d$ the number of lattice sites at distance $s\ge1$ is
+\begin{equation}\label{eq:shell}
+N_d(s)=\sum_{j=1}^{\min(d,s)}2^j\binom dj\binom{s-1}{j-1}.
+\end{equation}
+Choose the nonzero coordinates, their signs and a positive composition of
+$s$ to obtain this formula. Choosing one representative of each torus tie
+injects the torus shell into the lattice shell. For $d=3$, $N_3(s)=4s^2+2$;
+hence the distinct-site row sum is at most
+\[
+A\left[\frac{4q(1+q)}{(1-q)^3}+\frac{2q}{1-q}\right].
+\]
+In every fixed dimension~\eqref{eq:shell} grows polynomially, so the
+exponential bound is uniformly summable. This is the precise correlation
+meaning of the ceilings, not a numerical prediction for $T_c$.
+
+\section{Certificate, independent checks and limitations}\label{sec:certificate}
+
+The supplement contains a standalone Python standard-library program
+\texttt{replay.py}. Its default invocation certifies both cubic witnesses and
+the general-dimensional majorant. The option \texttt{--verify} additionally
+runs the two complete cubic enumerators, the $N=7,8$ lift comparison, the
+two-dimensional count guards, recursive edge-colouring checks and independent
+bond interval arithmetic. The option \texttt{--mutants} requires all 19
+specified corruptions to fail with exit code one and a stated rejecting guard.
+The harness itself returns zero only when all are rejected. There is no
+unconditional corrupted-input failure branch.
+
+For $x\ge0$, take $m> x$ an integer, $z=x/m<1$, and use a positive Taylor sum
+with the next-term geometric upper remainder for $e^z$, then raise both
+endpoints to the integer power $m$. For $x<0$, reciprocal bounds on $e^{-x}$
+reverse the endpoints. The outward dyadic implementation rounds after each
+arithmetic operation. The independent implementation uses unrounded rational
+sums with 24 terms. Its square-root bounds follow from integer-square-root
+floor inequalities on a fixed rational grid. For $B>1$, let
+$u=(B-1)/(B+1)\in(0,1)$ and use
+\[
+\ln B=2\sum_{j\ge0}\frac{u^{2j+1}}{2j+1},
+\]
+with a positive lower partial sum and a geometric upper tail.
+All fractional root comparisons use~\eqref{eq:rootcomparison}.
+No floating-point number decides acceptance; floating-point output is merely
+a calculated diagnostic display of already certified rational bounds.
+
+The mutations cover the cubic constants, odd colour count, bond scale and
+bound, claw degree, rooted one-edge count, Raney coefficient and arity,
+bridge multiplicity, source scale and Jacobian sign, decay ratio, KP budget,
+pair prefactor, both general-dimensional coefficients, and two explicit
+$Cy\ge1$ violations. The supplement records its command syntax and SHA-256
+byte custody. The independently implemented enumerators and interval routines
+are part of the same replay, not merely unexecuted alternative formulae.
+
+The scales were selected by numerical exploration, then pinned and certified.
+No global continuous-parameter optimum is claimed. The constants are rigorous
+clustering ceilings, not fitted or measured temperatures, and are not expected
+to locate a physical transition sharply. The $O(d^3)$ theorem removes the
+$O(d^4)$ growth of the earlier hypercubic estimate, but is not an optimal
+asymptotic-dimensionality assertion. The local chronological oscillator and
+pair-source trace lemmas remain the shared analytical ingredients of the
+released proof~\cite{rensSharp}; the present paper supplies the full
+additional geometry, source and dimension-dependent estimates.
+
+\section*{AI assistance}
+The analytical results, the design of the estimates, and the final text are the
+author's responsibility. Independent proof reviews of the argument and of the
+certificate program were carried out by separate AI systems, whose comments led to
+several corrections recorded in the present version. The manuscript, its LaTeX
+source, and the certificate program were drafted and edited with AI assistance under
+the author's direction and review.
+\addcontentsline{toc}{section}{AI assistance}
+
+This preprint has not been peer reviewed.
+
+\appendix
+\section{The chronological oscillator identity}\label{app:oscillator}
+
+For a single oscillator, let $D(c\eta,u)=
+\exp(c\eta e^{\Omega u}a^\dagger-c\eta e^{-\Omega u}a)$, with
+$\eta^2=U/(2\Omega)$. At times $0\le u_1<\cdots<u_m<\beta$, chronological
+ordering means the latest factor is on the left:
+\[
+\mathcal T\prod_jD(c_j\eta,u_j)
+=D(c_m\eta,u_m)\cdots D(c_1\eta,u_1).
+\]
+The jumps are neutral, $\sum_jc_j=0$, including physical pair-source jumps.
+Scalar BCH and thermal normal ordering give
+\begin{equation}\label{eq:oscidentity}
+\begin{split}
+\log\Tr_{\mathrm{ph},0}\!\left(\mathcal T\prod_jD(c_j\eta,u_j)\right)
+={}&-\frac{\eta^2}{2}\coth(\beta\Omega/2)\left(\sum_jc_j\right)^2\\
+&-\eta^2\sum_{i<j}c_ic_j
+\frac{\cosh(\beta\Omega/2-\Omega(u_j-u_i))
+-\cosh(\beta\Omega/2)}{\sinh(\beta\Omega/2)}.
+\end{split}
+\end{equation}
+The trace is normalized by the free-oscillator partition function.
+For neutral jumps the first term vanishes. Two integrations by parts for the
+periodic step occupation identify the second term with $-\Phi_\beta[n]$ in
+\eqref{eq:phi}. The positivity follows from the squared occupation difference
+and the positive kernel~\eqref{eq:kernel}, not from commuting chronological
+displacements. This identity includes all thermal winding and every
+finite positive frequency; no anti-adiabatic limit or low-frequency
+approximation is taken.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}

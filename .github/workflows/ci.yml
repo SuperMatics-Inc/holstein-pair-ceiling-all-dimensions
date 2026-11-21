@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TECTONIC_VERSION: "0.17.0"
+  TECTONIC_SHA256: "8533d07f9ccbd7a65824b9e0459041bca34af1eb33daba48f59215593753a3b7"
+  SOURCE_DATE_EPOCH: "1795132800"
+
+jobs:
+  replay:
+    name: Replay the certificate program on the release archive
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # The pinned sources are the reviewed bytes; the two pin files protect them as well.
+      - name: Pinned sources match the review
+        run: |
+          sha256sum paper/main.tex | grep -qx '66e07649fb010c1dd5115a70447010b09f5602d3803279ce8016f50abd1ca1ab  paper/main.tex'
+          sha256sum paper/refs.bib | grep -qx 'dcf25882cc003db239fd14a17778e0b754787445d2c2461e5fe34392f3bb1555  paper/refs.bib'
+          sha256sum paper/main.pdf | grep -qx '3dfdcf009cd20cf115b32570c195ef86dc07b74a3994e01eebad204d35f6108c  paper/main.pdf'
+          sha256sum replay/replay.py | grep -qx '9f447e681545357281b316b43fa483e9d41631990c4f9644ce25375c1fa4a84b  replay/replay.py'
+          sha256sum replay/README.md | grep -qx '95580bf4df44c3671c5eeeb80ad5d4896d7a6c33f1a928450b61fecb2042f78b  replay/README.md'
+
+      - name: Both pin files verify
+        run: |
+          sha256sum -c --strict MANIFEST.sha256
+          (cd replay && sha256sum -c --strict SHA256SUMS)
+
+      - name: The manifest covers every tracked file
+        run: |
+          git ls-files | grep -vx 'MANIFEST.sha256' | sort > /tmp/tracked.txt
+          grep -v '^\s*$' MANIFEST.sha256 | sed -E 's/^[0-9a-f]{64}  //' | sort > /tmp/manifested.txt
+          diff -u /tmp/tracked.txt /tmp/manifested.txt
+          echo "manifest entries: $(wc -l < /tmp/manifested.txt)"
+
+      - name: Build the release archive and run the replay on the unpacked copy
+        run: |
+          git archive --format=zip --prefix=holstein-pair-ceiling-all-dimensions-1.0.0/ \
+            --output=/tmp/release.zip HEAD
+          mkdir /tmp/unpacked
+          unzip -q /tmp/release.zip -d /tmp/unpacked
+          tracked="$(git ls-files | wc -l)"
+          cd /tmp/unpacked/holstein-pair-ceiling-all-dimensions-1.0.0
+          test "$(find . -type f | wc -l)" -eq "$tracked"
+          sha256sum -c --strict MANIFEST.sha256
+          (cd replay && sha256sum -c --strict SHA256SUMS)
+
+          python -B replay/replay.py > /tmp/replay.out 2> /tmp/replay.err
+          test ! -s /tmp/replay.err
+          test "$(wc -l < /tmp/replay.out)" -eq 7
+          for marker in \
+            'D3 even C= 22800' \
+            'D3 all C= 27900' \
+            'BOND dyadic cells= 101' \
+            'GENERAL d>=2: Ke= 4600 Ka= 5750' \
+            'GENERAL d=1 even C= 4600' \
+            'GENERAL d=1 all C= 5750'; do
+            grep -qF "$marker" /tmp/replay.out || { echo "missing from the replay output: $marker"; exit 1; }
+          done
+          grep -qxF 'CERTIFIED arithmetic witnesses; analytical extension PROVED following independent review' /tmp/replay.out
+
+          python -B replay/replay.py --verify > /tmp/verify.out 2> /tmp/verify.err
+          test ! -s /tmp/verify.err
+          for marker in \
+            'D3 even C= 22800' \
+            'D3 all C= 27900' \
+            'BOND independent cells= 101' \
+            'ENUM d=3 N= 4 total= 329734 classes= 21 two-methods=match' \
+            'ENUM d=3 N= 7 total= 336427 classes= 21 two-methods=match' \
+            'COLOUR independent recursive construction d=1..4 N=4..7' \
+            'VERIFIED independent full k<=6 enumeration, direct Taylor/isqrt intervals and d2 guards'; do
+            grep -qF "$marker" /tmp/verify.out || { echo "missing from the verify output: $marker"; exit 1; }
+          done
+
+          python -B replay/replay.py --mutants > /tmp/mutants.out 2> /tmp/mutants.err
+          test ! -s /tmp/mutants.err
+          test "$(grep -c 'REJECTED ' /tmp/mutants.out)" -eq 19
+          grep -qxF 'CERTIFIED: 19 mutants refused with child exit 1' /tmp/mutants.out
+
+          rc=0
+          python -B replay/replay.py --mutant general-one-scale-below-one > /tmp/mutant.out 2> /tmp/mutant.err || rc=$?
+          test "$rc" -eq 1
+          grep -qF 'REJECTED general-one-scale-admissible' /tmp/mutant.out
+          echo "default, verify and mutant modes passed on the unpacked archive"
+
+  paper:
+    name: Build the manuscript with Tectonic and verify the released PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install poppler
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Install the pinned Tectonic release
+        run: |
+          curl -fsSL -o /tmp/tectonic.tar.gz \
+            "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+          echo "${TECTONIC_SHA256}  /tmp/tectonic.tar.gz" | sha256sum -c --strict -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf /tmp/tectonic.tar.gz -C "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/tectonic" --version
+
+      - name: Released bytes match the review
+        run: |
+          cp paper/main.pdf /tmp/released.pdf
+          sha256sum paper/main.tex | grep -qx '66e07649fb010c1dd5115a70447010b09f5602d3803279ce8016f50abd1ca1ab  paper/main.tex'
+          sha256sum paper/refs.bib | grep -qx 'dcf25882cc003db239fd14a17778e0b754787445d2c2461e5fe34392f3bb1555  paper/refs.bib'
+          sha256sum /tmp/released.pdf | grep -qx '3dfdcf009cd20cf115b32570c195ef86dc07b74a3994e01eebad204d35f6108c  /tmp/released.pdf'
+
+      - name: Rebuild the manuscript with the pinned epoch
+        working-directory: paper
+        run: |
+          tectonic -X compile --keep-logs main.tex
+          test "$(grep -c '^Overfull' main.log)" -eq 0 || { grep -n '^Overfull' main.log; exit 1; }
+          test "$(grep -c '^Underfull' main.log)" -eq 0 || { grep -n '^Underfull' main.log; exit 1; }
+          test "$(grep -c 'undefined' main.log)" -eq 0 || { grep -n 'undefined' main.log; exit 1; }
+          test "$(grep -c 'Warning' main.log)" -eq 0 || { grep -n 'Warning' main.log; exit 1; }
+          pdfinfo main.pdf | tee /tmp/built.info
+          grep -qx 'Pages:[[:space:]]*15' /tmp/built.info
+          grep -q 'Davis Rens' /tmp/built.info
+          sha256sum main.pdf
+          pdftotext -raw main.pdf /tmp/built.txt
+          pdftotext -raw /tmp/released.pdf /tmp/released.txt
+          tr -d ' \n\t\r' < /tmp/built.txt > /tmp/built.flat
+          tr -d ' \n\t\r' < /tmp/released.txt > /tmp/released.flat
+          cmp /tmp/built.flat /tmp/released.flat
+          echo "the rebuilt text equals the released text"
+
+      - name: The released PDF carries the title, identifiers and disclosed status
+        run: |
+          pdfinfo /tmp/released.pdf | tee /tmp/released.info
+          grep -qx 'Pages:[[:space:]]*15' /tmp/released.info
+          grep -qx 'Title:[[:space:]]*Certified cubic and general-dimensional strong-coupling ceilings for electronic pair correlations in the Holstein model' /tmp/released.info
+          grep -qx 'Author:[[:space:]]*Davis Rens, SuperMatics Inc., ORCID 0000-0001-5839-5197' /tmp/released.info
+          PYTHONDONTWRITEBYTECODE=1 python3 ci/verify_text.py /tmp/released.txt
+
+      - name: Public prose safeguards
+        run: |
+          test "$(grep -c 'This preprint has not been peer reviewed.' paper/main.tex)" -eq 1
+          test "$(grep -c 'PROVED' paper/main.tex)" -eq 0
+          test "$(grep -c 'CERTIFIED' paper/main.tex)" -eq 0
+          test "$(grep -c '—' paper/main.tex)" -eq 0
+          if git grep -nE 'D:/|C:/|/scratch/|ceiling-20261118|MASSIVE' -- . ':!.github/workflows/ci.yml'; then
+            echo "hardcoded local path in a released file"
+            exit 1
+          fi
+          test -z "$(find . -path ./.git -prune -o -type f \( -iname '*review*' -o -iname 'notes*' -o -iname '*fix*' -o -iname '*scoping*' -o -iname '*.v[0-9].*' -o -iname '*.bak' \) -print)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: holstein-pair-ceiling-all-dimensions-paper
+          path: |
+            paper/main.pdf
+            paper/main.tex
+            paper/refs.bib
+          if-no-files-found: error
