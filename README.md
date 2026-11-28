@@ -1,4 +1,5 @@
 # Certified cubic and general-dimensional strong-coupling ceilings for electronic pair correlations in the Holstein model
+Research record: [Certified cubic and general-dimensional strong-coupling ceilings for electronic pair correlations in the Holstein model](https://supermatics.io/research/cubic-all-dimension-pair-ceiling).
 
 Davis Rens, SuperMatics Inc., [ORCID 0000-0001-5839-5197](https://orcid.org/0000-0001-5839-5197)
 
